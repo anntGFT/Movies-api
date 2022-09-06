@@ -10,14 +10,14 @@ import javax.persistence.*;
 @ToString
 @Getter
 @Setter
+@Table(name = "movies")
 public class Movie {
-    @Column(name = "user_id")
     @ManyToOne
     @JoinColumn(name = "id")
-    private User userId;
+    private User id;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private int movie_id;
     private boolean favorite;
     @Column(name = "personal_rating")
     private int personalRating;
