@@ -1,26 +1,113 @@
 package com.sinensia.moviesapi.service;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.HashMap;
 
 @Service
 public class MovieService {
+    WebClient webClient = WebClient.create("https://api.themoviedb.org/3/");
+    @Value("${tmdb.api_key}")
+    private String apiKey;
 
-    public ResponseEntity<String> init(String url) {
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth("eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlOWYwZGM3MmJhY2FlYTA5ZDViZmM2ZjdmZmE1MTY1NiIsInN1YiI6IjYzMTVhZDFkMG" +
-                "MxMjU1MDA5MjNhZTM3YSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Y8bmdpj8dHbfv_-o-g9yWL3LjSMPeBcT59c3dM_9z6c");
-        HttpEntity<?> request = new HttpEntity<>(headers);
+    public HashMap<?,?> getAllGenres() {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path("genre/movie/list")
+                        .queryParam("api_key", apiKey)
+                        .build()
+                )
+                .retrieve()
+                .bodyToMono(HashMap.class)
+                .block();
+    }
 
-        return restTemplate.exchange(url, HttpMethod.GET,request,String.class);
+    public HashMap<?,?> getPopular() {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path("movie/popular")
+                        .queryParam("api_key", apiKey)
+                        .build()
+                )
+                .retrieve()
+                .bodyToMono(HashMap.class)
+                .block();
+    }
+
+    public HashMap<?,?> getTopRated() {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path("movie/top_rated")
+                        .queryParam("api_key", apiKey)
+                        .build()
+                )
+                .retrieve()
+                .bodyToMono(HashMap.class)
+                .block();
+    }
+
+    public HashMap<String,Object> getMovieById(Integer id) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path("movie/"+id.toString())
+                        .queryParam("api_key", apiKey)
+                        .build()
+                )
+                .retrieve()
+                .bodyToMono(HashMap.class)
+                .block();
+    }
+
+    public HashMap<?,?> getCastAndCrew(Integer id) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path("movie/"+id.toString()+"/credits")
+                        .queryParam("api_key", apiKey)
+                        .build()
+                )
+                .retrieve()
+                .bodyToMono(HashMap.class)
+                .block();
+    }
+
+    public HashMap<?,?> getAllImages(Integer id) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path("movie/"+id.toString()+"/images")
+                        .queryParam("api_key", apiKey)
+                        .build()
+                )
+                .retrieve()
+                .bodyToMono(HashMap.class)
+                .block();
+    }
+
+    public HashMap<?,?> getKeywords(Integer id) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path("movie/"+id.toString()+"/keywords")
+                        .queryParam("api_key", apiKey)
+                        .build()
+                )
+                .retrieve()
+                .bodyToMono(HashMap.class)
+                .block();
+    }
+
+    public HashMap<?,?> getRecommendations(Integer id) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path("movie/"+id.toString()+"/recommendations")
+                        .queryParam("api_key", apiKey)
+                        .build()
+                )
+                .retrieve()
+                .bodyToMono(HashMap.class)
+                .block();
+    }
+
+    public HashMap<?,?> getSimilarMovies(Integer id) {
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path("movie/"+id.toString()+"/similar")
+                        .queryParam("api_key", apiKey)
+                        .build()
+                )
+                .retrieve()
+                .bodyToMono(HashMap.class)
+                .block();
     }
 }

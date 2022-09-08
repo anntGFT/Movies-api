@@ -1,74 +1,97 @@
 package com.sinensia.moviesapi.controller;
 
+import com.sinensia.moviesapi.model.User;
+import com.sinensia.moviesapi.repository.UserRepository;
 import com.sinensia.moviesapi.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 @RestController
 public class MovieController {
 
     @Autowired
     MovieService service;
+    @Autowired
+    UserRepository repository;
 
 
+    @GetMapping("/api/genre/movie/list")
+    public HashMap<?,?> getAllGenres() {
 
-    @GetMapping("api/genre/movie/list")
-    public ResponseEntity<String> getListGenres(){
-        String url = "https://api.themoviedb.org/3/genre/movie/list";
-        return service.init(url);
+        return service.getAllGenres();
     }
-
     @GetMapping("api/movie/popular")
-    public ResponseEntity<String> getPopular(){
-        String url = "https://api.themoviedb.org/3/movie/popular";
-        return service.init(url);
-    }
+    public HashMap<?,?> getPopularMovies(){
 
+        return service.getPopular();
+    }
     @GetMapping("api/movie/top_rated")
-    public ResponseEntity<String> getTop(){
-        String url = "https://api.themoviedb.org/3/movie/top_rated";
-        return service.init(url);
+    public HashMap<?,?> getTopRated(){
+
+        return service.getTopRated();
+    }
+    @GetMapping("api/movie/{movie_id}")
+    public HashMap<?,?> getMovieById(@AuthenticationPrincipal UserDetails user, @PathVariable Integer movie_id){
+
+        User userMovie = repository.findByUsernameAndMovie(user.getUsername(),movie_id.toString()).orElse(null);
+        HashMap<String, Object> movie = service.getMovieById(movie_id);
+
+        if(userMovie != null){
+            movie.put("favorite",userMovie.getFavorite());
+            movie.put("personal_rating",userMovie.getPersonalRating());
+            movie.put("notes",userMovie.getNotes());
+        }
+
+        return movie;
     }
 
-    @GetMapping("api/movie/{movie_id}")
-    public ResponseEntity<String> getMovieById(@PathVariable int movie_id){
-        String url = "https://api.themoviedb.org/3/movie/" + movie_id;
-        return service.init(url);
+    @PatchMapping("api/movie/{movie_id}")
+    public ResponseEntity<User> putFavoritePersonalRatingNotes(@PathVariable Integer movie_id, @RequestBody User newUserMovie, @AuthenticationPrincipal UserDetails user){
+
+        User updatedMovie = repository.findByUsernameAndMovie(user.getUsername(),movie_id.toString()).orElse(null);
+        if(updatedMovie == null){
+            updatedMovie = new User();
+        }
+        updatedMovie.setUsername(user.getUsername());
+        updatedMovie.setMovie(movie_id.toString());
+        updatedMovie.setFavorite(newUserMovie.getFavorite());
+        updatedMovie.setPersonalRating(newUserMovie.getPersonalRating());
+        updatedMovie.setNotes((newUserMovie.getNotes()));
+
+        repository.save(updatedMovie);
+
+        return new ResponseEntity<>(updatedMovie, HttpStatus.OK);
     }
 
     @GetMapping("api/movie/{movie_id}/credits")
-    public ResponseEntity<String> getCreditsFromMovieById(@PathVariable int movie_id){
-        String url = "https://api.themoviedb.org/3/movie/credits" + movie_id + "/credits";
-        return service.init(url);
-    }
+    public HashMap<?,?> getCastAndCrew(@PathVariable Integer movie_id){
 
+        return service.getCastAndCrew(movie_id);
+    }
     @GetMapping("api/movie/{movie_id}/images")
-    public ResponseEntity<String> getImageFromMovieById(@PathVariable int movie_id){
-        String url = "https://api.themoviedb.org/3/movie/" + movie_id + "/images";
-        return service.init(url);
-    }
+    public HashMap<?,?> getImages(@PathVariable Integer movie_id){
 
+        return service.getAllImages(movie_id);
+    }
     @GetMapping("api/movie/{movie_id}/keywords")
-    public ResponseEntity<String> getKeywordsFromMovieById(@PathVariable int movie_id){
-        String url = "https://api.themoviedb.org/3/movie/" + movie_id + "/keywords";
-        return service.init(url);
+    public HashMap<?,?> getKeywords(@PathVariable Integer movie_id){
+
+        return service.getKeywords(movie_id);
     }
     @GetMapping("api/movie/{movie_id}/recommendations")
-    public ResponseEntity<String> getRecommendationsFromMovieById(@PathVariable int movie_id){
-        String url = "https://api.themoviedb.org/3/movie/" + movie_id + "/recommendations";
-        return service.init(url);
+    public HashMap<?,?> getRecommendations(@PathVariable Integer movie_id){
+
+        return service.getRecommendations(movie_id);
     }
     @GetMapping("api/movie/{movie_id}/similar")
-    public ResponseEntity<String> getSimilarFromMovieById(@PathVariable int movie_id){
-        String url = "https://api.themoviedb.org/3/movie/" + movie_id + "/similar";
-        return service.init(url);
+    public HashMap<?,?> getSimilar(@PathVariable Integer movie_id){
+
+        return service.getSimilarMovies(movie_id);
     }
 
 }

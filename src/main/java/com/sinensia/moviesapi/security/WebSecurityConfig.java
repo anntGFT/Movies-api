@@ -28,32 +28,9 @@ public class WebSecurityConfig {
 
     @Autowired
     public void configAuthentication(AuthenticationManagerBuilder auth) throws Exception {
-        auth.jdbcAuthentication().passwordEncoder(new BCryptPasswordEncoder())
-                .dataSource(dataSource);
+        auth.jdbcAuthentication().dataSource(dataSource);
     }
 
-    @Bean
-    UserDetailsManager users(DataSource dataSource) {
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("password")
-                .roles("USER")
-                .build();
-        UserDetails admin = User.withDefaultPasswordEncoder()
-                .username("admin")
-                .password("admin")
-                .roles("USER", "ADMIN")
-                .build();
-        JdbcUserDetailsManager users = new JdbcUserDetailsManager(dataSource);
-        users.createUser(user);
-        users.createUser(admin);
-        return users;
-    }
-
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -64,7 +41,7 @@ public class WebSecurityConfig {
                 .and().headers().frameOptions().sameOrigin()
                 .and().authorizeRequests()
                 .anyRequest()
-                .authenticated()
+                .permitAll()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
