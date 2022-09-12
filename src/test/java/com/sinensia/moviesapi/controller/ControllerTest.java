@@ -108,12 +108,7 @@ public class ControllerTest {
         Integer id = 550;
         User userMovie = new User();
 
-        Principal principal = new Principal() {
-            @Override
-            public String getName() {
-                return "admin";
-            }
-        };
+        Principal principal = () -> "admin";
 
         given(repository.findByUsernameAndMovie(principal.getName(),id.toString())).willReturn(Optional.of(userMovie));
         given(repository.save(userMovie)).willAnswer((invocation)->invocation.getArgument(0));

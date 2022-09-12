@@ -71,7 +71,7 @@ public class MovieController {
     @GetMapping("api/movie/{movie_id}/credits")
     public HashMap<?,?> getCastAndCrew(@PathVariable Integer movie_id){
 
-        return service.getCastAndCrew(movie_id);
+        return service.getredits(movie_id);
     }
     @GetMapping("api/movie/{movie_id}/images")
     public HashMap<?,?> getImages(@PathVariable Integer movie_id){

@@ -1,6 +1,7 @@
 package com.sinensia.moviesapi.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -11,7 +12,7 @@ public class MovieService {
     WebClient webClient = WebClient.create("https://api.themoviedb.org/3/");
     @Value("${tmdb.api_key}")
     private String apiKey;
-
+@Cacheable("genres")
     public HashMap<?,?> getAllGenres() {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("genre/movie/list")
@@ -22,7 +23,7 @@ public class MovieService {
                 .bodyToMono(HashMap.class)
                 .block();
     }
-
+    @Cacheable("popular")
     public HashMap<?,?> getPopular() {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("movie/popular")
@@ -33,7 +34,7 @@ public class MovieService {
                 .bodyToMono(HashMap.class)
                 .block();
     }
-
+    @Cacheable("top_rated")
     public HashMap<?,?> getTopRated() {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("movie/top_rated")
@@ -44,7 +45,7 @@ public class MovieService {
                 .bodyToMono(HashMap.class)
                 .block();
     }
-
+    @Cacheable("movie")
     public HashMap<String,Object> getMovieById(Integer id) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("movie/"+id.toString())
@@ -55,8 +56,8 @@ public class MovieService {
                 .bodyToMono(HashMap.class)
                 .block();
     }
-
-    public HashMap<?,?> getCastAndCrew(Integer id) {
+    @Cacheable("credits")
+    public HashMap<?,?> getredits(Integer id) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("movie/"+id.toString()+"/credits")
                         .queryParam("api_key", apiKey)
@@ -66,7 +67,7 @@ public class MovieService {
                 .bodyToMono(HashMap.class)
                 .block();
     }
-
+    @Cacheable("images")
     public HashMap<?,?> getAllImages(Integer id) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("movie/"+id.toString()+"/images")
@@ -77,7 +78,7 @@ public class MovieService {
                 .bodyToMono(HashMap.class)
                 .block();
     }
-
+    @Cacheable("keywords")
     public HashMap<?,?> getKeywords(Integer id) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("movie/"+id.toString()+"/keywords")
@@ -88,7 +89,7 @@ public class MovieService {
                 .bodyToMono(HashMap.class)
                 .block();
     }
-
+    @Cacheable("recommendations")
     public HashMap<?,?> getRecommendations(Integer id) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("movie/"+id.toString()+"/recommendations")
@@ -99,7 +100,7 @@ public class MovieService {
                 .bodyToMono(HashMap.class)
                 .block();
     }
-
+    @Cacheable("similar")
     public HashMap<?,?> getSimilarMovies(Integer id) {
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("movie/"+id.toString()+"/similar")
