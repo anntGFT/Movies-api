@@ -57,6 +57,7 @@ public class MovieController {
         if(updatedMovie == null){
             updatedMovie = new User();
         }
+        //funciona
         updatedMovie.setUsername(user.getUsername());
         updatedMovie.setMovie(movie_id.toString());
         updatedMovie.setFavorite(newUserMovie.getFavorite());
